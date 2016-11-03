@@ -2,7 +2,8 @@
 
 Yet another Astroids game simulator. Create when learning ReactJS.
 
-![astroids](https://github.com/phg1024/Astroids/raw/master/src/sample.png "Sample Image")
-
+<div align="center">
+<img src="https://github.com/phg1024/Astroids/raw/master/src/sample.png"/>
+</div>
 
 [Play it here.](https://phg1024.github.io/Astroids/)
