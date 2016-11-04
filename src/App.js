@@ -154,6 +154,8 @@ class Ship extends Component {
     var velo = this.state.velo;
     velo[0] -= move_dir[0] * s;
     velo[1] -= move_dir[1] * s;
+    velo[0] = Math.min(10.0, Math.abs(velo[0])) * Math.sign(velo[0]);
+    velo[1] = Math.min(10.0, Math.abs(velo[1])) * Math.sign(velo[1]);
     this.setState({velo: velo});
   }
   render() {
@@ -195,8 +197,9 @@ class App extends Component {
       pos: [320, 240],
       color: 'white'
     };
-    this.state = {circles: circles, ship: ship, num_astroids: 8, key: null};
-    document.getElementById("body").onkeypress = this.handleKeyPress;
+    this.state = {circles: circles, ship: ship, num_astroids: 8, key: {}};
+    //document.getElementById("body").onkeypress = this.handleKeyPress;
+    document.getElementById("body").onkeydown = document.getElementById("body").onkeyup = this.handleKeyPress;
   }
   renderCircle(i) {
     var obj = this.state.circles[i];
@@ -217,30 +220,57 @@ class App extends Component {
 
   handleKeyPress = (event) => {
     console.log(event);
-    this.setState({key: event.key});
-    switch(event.key) {
-      case 'A':
-      case 'a': {
-        console.log('turn left');
-        this.refs.ship.turn(-5);
-        break;
-      }
-      case 'D':
-      case 'd': {
-        console.log('turn right');
-        //this.refs.ship.move(1, 0);
-        this.refs.ship.turn(5);
-        break;
-      }
-      case 'W':
-      case 'w': {
-        console.log('move forward');
-        this.refs.ship.move_forward(5);
-        break;
-      }
-      case ' ': {
-        console.log('shoot');
-        break;
+    var keys = this.state.key;
+    keys[event.key] = (event.type == 'keydown');
+    console.log(keys);
+    this.setState({key: keys});
+
+    var good = false;
+    for(var k in keys) {
+      good |= keys[k];
+    }
+
+    if( good ) {
+        var pre_timer = this.state.timer;
+        if(pre_timer != null) clearInterval(pre_timer);
+        var timer = setInterval(this.processKeyPress, 25);
+        this.setState({timer: timer});
+    } else {
+        var timer = this.state.timer;
+        clearInterval(timer);
+        this.setState({timer: null});
+    }
+  }
+
+  processKeyPress = () => {
+    var keys = this.state.key;
+    for(var k in keys) {
+      if(keys[k]) {
+        switch(k) {
+          case 'A':
+          case 'a': {
+            //console.log('turn left');
+            this.refs.ship.turn(-1.0);
+            break;
+          }
+          case 'D':
+          case 'd': {
+            //console.log('turn right');
+            //this.refs.ship.move(1, 0);
+            this.refs.ship.turn(1.0);
+            break;
+          }
+          case 'W':
+          case 'w': {
+            //console.log('move forward');
+            this.refs.ship.move_forward(2.5);
+            break;
+          }
+          case ' ': {
+            //console.log('shoot');
+            break;
+          }
+        }
       }
     }
   }
